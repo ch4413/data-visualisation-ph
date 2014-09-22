@@ -1,0 +1,53 @@
+##################
+## Assignment   ##
+##################
+## Chris Hughes ##
+##################
+## 31/08/2014   ##
+##################
+
+## 0. Pre-processing
+## Import GDP csv
+setwd("/Users/Bioengineering_MRes/Desktop")
+
+GDP_df <- read.csv("GDP_urbanisation.csv", sep="\t") #can be generalised to file.choose(), ...
+
+## Import FAO csv
+
+FAO_df <- read.csv("FAO_data_raw.csv", sep=" ") #can be generalised to file.choose(), ...
+
+
+## 1.0 Data Handling
+	
+# Remove years that are not in both data sets
+
+	Years_valid_index <- match(unique(GDP_df$data_year), unique(FAO_df$Year))
+	Years_valid_w_na <- FAO_df$Year[Years_valid_index]
+	Years_valid <- sort(na.omit(Years_valid_w_na))
+	
+	FAO_df_edit <- FAO_df[which(FAO_df$Year %in% Years_valid), ]
+	GDP_df_edit <- GDP_df[which(GDP_df$data_year %in% Years_valid), ]
+	
+	FAO_df <- FAO_df_edit
+	GDP_df <- GDP_df_edit
+	
+	# Remove Countries that are not in both GDP and FAO data sets
+	
+	Countries_in_FAO = levels(FAO_df$Country)
+	Countries_in_GDP = levels(GDP_df$country)
+	
+	Countries_in_both = intersect(Countries_in_FAO, Countries_in_GDP)
+	
+	FAO_df_edit <- FAO_df[which(FAO_df$Country %in% Countries_in_both), ]
+	GDP_df_edit <- GDP_df[which(GDP_df$country %in% Countries_in_both), ]
+	
+	GDP_df <- GDP_df_edit
+	FAO_df <- FAO_df_edit
+	
+	# Set up presets (maximum values) for when variables are not inputted to function
+	
+	Year_range <- unique(GDP_df$data_year)
+	All_regions <- unique(GDP_df$sregion)
+	All_items <- unique(FAO_df$Item)
+	Item_indices <- 1: length(All_items)
+	
